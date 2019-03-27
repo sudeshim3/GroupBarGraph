@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -42,14 +43,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         barChart = findViewById(R.id.barchart);
-        setChart();
+        setChart(3);
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int switchId) {
+
+                switch (switchId) {
+                    case R.id.one_month:
+                        setChart(1);
+                        break;
+                    case R.id.three_month:
+                        setChart(3);
+                        break;
+                    case R.id.six_month:
+                        setChart(6);
+                        break;
+                    case R.id.tweleve_month:
+                        setChart(12);
+                        break;
+                }
+            }
+        });
     }
 
-    private void setChart() {
 
-        ArrayList<BarEntry> incomeEntries = getIncomeEntries();
-        ArrayList<BarEntry> expenseEntries = getExpenseEntries();
+    private void setChart(int size) {
 
+        List<BarEntry> incomeEntries = getIncomeEntries(size);
+        List<BarEntry> expenseEntries = getExpenseEntries(size);
+        dataSets = new ArrayList<>();
         BarDataSet set1, set2;
 
         set1 = new BarDataSet(incomeEntries, "Income");
@@ -77,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
         barChart.setPinchZoom(false);
         barChart.setDrawGridBackground(false);
 
-        barChart.animateY(1400, Easing.EaseInOutQuad);
-        barChart.animateXY(3000, 3000);
 
         Legend l = barChart.getLegend();
         l.setWordWrapEnabled(true);
@@ -95,22 +116,7 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setDrawGridLines(false);
         xAxis.setLabelRotationAngle(-45);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setAxisMaximum(getExpenseEntries().size());
-
-
-
-        /*IndexAxisValueFormatter formatter = new IndexAxisValueFormatter() {
-
-
-            @Override
-            public String getFormattedValue(float value) {
-                if(value < 0)
-                    return "";
-                else
-                    return xAxisValues.get((int)value);
-
-            }
-        };*/
+        xAxis.setAxisMaximum(getExpenseEntries(size).size());
 
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(xAxisValues));
 
@@ -123,12 +129,12 @@ public class MainActivity extends AppCompatActivity {
         leftAxis.setDrawGridLines(false);
         barChart.getAxisRight().setEnabled(false);
 
-        setBarWidth(data);
+        setBarWidth(data, size);
         barChart.invalidate();
 
     }
 
-    private void setBarWidth(BarData barData) {
+    private void setBarWidth(BarData barData, int size) {
         if (dataSets.size() > 1) {
             float barSpace = 0.02f;
             float groupSpace = 0.3f;
@@ -138,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "Default Barwdith " + defaultBarWidth, Toast.LENGTH_SHORT).show();
             }
-            int groupCount = getExpenseEntries().size();
+            int groupCount = getExpenseEntries(size).size();
             if (groupCount != -1) {
                 barChart.getXAxis().setAxisMinimum(0);
                 barChart.getXAxis().setAxisMaximum(0 + barChart.getBarData().getGroupWidth(groupSpace, barSpace) * groupCount);
@@ -152,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ArrayList<BarEntry> getExpenseEntries() {
+    private List<BarEntry> getExpenseEntries(int size) {
         ArrayList<BarEntry> expenseEntries = new ArrayList<>();
 
         expenseEntries.add(new BarEntry(1,1710));
@@ -167,11 +173,13 @@ public class MainActivity extends AppCompatActivity {
         expenseEntries.add(new BarEntry(10,11340));
         expenseEntries.add(new BarEntry(11,9100));
         expenseEntries.add(new BarEntry(12,6300));
-        return expenseEntries;
+        return expenseEntries.subList(0, size);
     }
 
-    private ArrayList<BarEntry> getIncomeEntries() {
+    private List<BarEntry> getIncomeEntries(int size) {
         ArrayList<BarEntry> incomeEntries = new ArrayList<>();
+
+
 
         incomeEntries.add(new BarEntry(1, 11300));
         incomeEntries.add(new BarEntry(2, 1390));
@@ -185,6 +193,6 @@ public class MainActivity extends AppCompatActivity {
         incomeEntries.add(new BarEntry(10, 8762));
         incomeEntries.add(new BarEntry(11, 4355));
         incomeEntries.add(new BarEntry(12, 6000));
-        return incomeEntries;
+        return incomeEntries.subList(0, size);
     }
 }
