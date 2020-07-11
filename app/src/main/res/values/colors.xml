@@ -3,4 +3,6 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorAvailableSlot">#3AB54B</color>
+    <color name="colorUnAvailableSlot">#949599</color>
 </resources>
